@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Рабочий TikTok Фасад</title>
-
+    
     <style>
         /* Главный контейнер для видео */
         .tiktok-facade {
@@ -21,24 +21,23 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-            /* Текст-заглушка на фоне */
-            .tiktok-facade::after {
-                content: 'Открыть TikTok видео';
-                position: absolute;
-                bottom: 35px;
-                left: 0;
-                width: 100%;
-                text-align: center;
-                color: rgba(255, 255, 255, 0.5);
-                font-size: 14px;
-                font-weight: 500;
-                pointer-events: none;
-                transition: color 0.2s;
-            }
-
-            .tiktok-facade:hover::after {
-                color: rgba(255, 255, 255, 0.8);
-            }
+        /* Текст-заглушка на фоне */
+        .tiktok-facade::after {
+            content: 'Открыть TikTok видео';
+            position: absolute;
+            bottom: 35px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            font-weight: 500;
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+        .tiktok-facade:hover::after {
+            color: rgba(255, 255, 255, 0.8);
+        }
 
         /* Кнопка Play */
         .play-button {
@@ -75,7 +74,7 @@
             border-color: transparent transparent transparent #ffffff;
         }
 
-        /* Состояние загрузки (крутилка или текст) */
+        /* Состояние загрузки */
         .tiktok-loading {
             position: absolute;
             inset: 0;
@@ -85,6 +84,7 @@
             color: #fff;
             background: #121214;
             font-size: 15px;
+            z-index: 1;
         }
 
         /* Стили для встроенного фрейма */
@@ -100,8 +100,8 @@
 </head>
 <body>
 
-    <!-- Контейнер с вашим реальным ID видео -->
-    <div class="tiktok-facade" data-video-id="7058210807712156930">
+    <!-- Контейнер с вашим ID видео -->
+    <div class="tiktok-facade" data-video-id="7055006766131711234">
         <button class="play-button" aria-label="Воспроизвести видео"></button>
     </div>
 
@@ -117,18 +117,20 @@
                     const videoId = facade.dataset.videoId;
                     if (!videoId) return;
 
-                    // 1. Показываем статус загрузки, чтобы экран не оставался пустым
+                    // 1. Показываем статус загрузки
                     facade.innerHTML = '<div class="tiktok-loading">Загрузка плеера...</div>';
 
-                    // 2. Создаем iframe с использованием стабильного API плеера v1
+                    // 2. Создаем iframe
                     const iframe = document.createElement("iframe");
-
-                    // Обновленный современный эндпоинт, разрешенный для локального и веб-использования
-                    iframe.src = `https://tiktok.com{videoId}?autoplay=1&loop=1`;
-
-                    // Права доступа для видеокарты сайта и автоплея
+                    
+                    /* 
+                       ЖЕСТКАЯ ССЫЛКА БЕЗ СЛОЖНЫХ СИМВОЛОВ:
+                       Здесь мы просто склеиваем чистый адрес и ID видео обычным плюсом. 
+                       Никаких слияний букв теперь физически произойти не может.
+                    */
+                    iframe.src = "https://tiktok.com" + videoId + "?autoplay=1&loop=1";
+                    
                     iframe.setAttribute("allow", "autoplay; encrypted-media; fullscreen");
-                    // Набор песочниц для корректного отображения скриптов внутри TikTok
                     iframe.setAttribute("sandbox", "allow-clicks allow-popups allow-popups-to-escape-sandbox allow-scripts allow-top-navigation allow-same-origin");
 
                     // 3. Как только iframe полностью загрузится, удаляем надпись "Загрузка..."
