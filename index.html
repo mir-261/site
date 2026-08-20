@@ -1,12 +1,148 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="style/main.css">
+    <title>Рабочий TikTok Фасад</title>
+
+    <style>
+        /* Главный контейнер для видео */
+        .tiktok-facade {
+            position: relative;
+            width: 100%;
+            max-width: 325px; /* Стандартная ширина TikTok */
+            aspect-ratio: 9 / 16; /* Вертикальное соотношение */
+            background: linear-gradient(135deg, #121214 0%, #222229 100%);
+            border-radius: 16px;
+            cursor: pointer;
+            overflow: hidden;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+            display: inline-block;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+            /* Текст-заглушка на фоне */
+            .tiktok-facade::after {
+                content: 'Открыть TikTok видео';
+                position: absolute;
+                bottom: 35px;
+                left: 0;
+                width: 100%;
+                text-align: center;
+                color: rgba(255, 255, 255, 0.5);
+                font-size: 14px;
+                font-weight: 500;
+                pointer-events: none;
+                transition: color 0.2s;
+            }
+
+            .tiktok-facade:hover::after {
+                color: rgba(255, 255, 255, 0.8);
+            }
+
+        /* Кнопка Play */
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 68px;
+            height: 68px;
+            background: #ff0050; /* Фирменный цвет TikTok */
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 2;
+            box-shadow: 0 6px 20px rgba(255, 0, 80, 0.4);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tiktok-facade:hover .play-button {
+            transform: translate(-50%, -50%) scale(1.08);
+            background: #ef004b;
+            box-shadow: 0 6px 26px rgba(255, 0, 80, 0.6);
+        }
+
+        /* Белый треугольник внутри кнопки */
+        .play-button::after {
+            content: '';
+            display: block;
+            margin-left: 27px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 10px 0 10px 16px;
+            border-color: transparent transparent transparent #ffffff;
+        }
+
+        /* Состояние загрузки (крутилка или текст) */
+        .tiktok-loading {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            background: #121214;
+            font-size: 15px;
+        }
+
+        /* Стили для встроенного фрейма */
+        .tiktok-facade iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+            position: relative;
+            z-index: 3;
+        }
+    </style>
 </head>
 <body>
-  <h1>Сувениры</h1>
+
+    <!-- Контейнер с вашим реальным ID видео -->
+    <div class="tiktok-facade" data-video-id="7055006766131711234">
+        <button class="play-button" aria-label="Воспроизвести видео"></button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const facades = document.querySelectorAll(".tiktok-facade");
+
+            facades.forEach(facade => {
+                facade.addEventListener("click", function handler() {
+                    // Отключаем повторные клики
+                    facade.removeEventListener("click", handler);
+
+                    const videoId = facade.dataset.videoId;
+                    if (!videoId) return;
+
+                    // 1. Показываем статус загрузки, чтобы экран не оставался пустым
+                    facade.innerHTML = '<div class="tiktok-loading">Загрузка плеера...</div>';
+
+                    // 2. Создаем iframe с использованием стабильного API плеера v1
+                    const iframe = document.createElement("iframe");
+
+                    // Обновленный современный эндпоинт, разрешенный для локального и веб-использования
+                    iframe.src = `https://tiktok.com{videoId}?autoplay=1&loop=1`;
+
+                    // Права доступа для видеокарты сайта и автоплея
+                    iframe.setAttribute("allow", "autoplay; encrypted-media; fullscreen");
+                    // Набор песочниц для корректного отображения скриптов внутри TikTok
+                    iframe.setAttribute("sandbox", "allow-clicks allow-popups allow-popups-to-escape-sandbox allow-scripts allow-top-navigation allow-same-origin");
+
+                    // 3. Как только iframe полностью загрузится, удаляем надпись "Загрузка..."
+                    iframe.onload = () => {
+                        const loader = facade.querySelector(".tiktok-loading");
+                        if (loader) loader.remove();
+                    };
+
+                    // 4. Вставляем iframe в контейнер
+                    facade.appendChild(iframe);
+                });
+            });
+        });
+    </script>
+
 </body>
 </html>
